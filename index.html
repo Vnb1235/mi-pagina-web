@@ -116,8 +116,6 @@
         </div>
 
         <p id="no-result">❌ Canción no encontrada</p>
-
-        <button onclick="mostrarFormulario()">➕ Agregar Canción</button>
         
         <ul id="lista-canciones"></ul>
 
@@ -125,25 +123,17 @@
             <button onclick="cerrarDetalle()">🔙 Volver</button>
             <h2 id="titulo-cancion"></h2>
             <pre id="letra-cancion"></pre>
-            <div class="buttons">
-                <button onclick="editarCancion()">✏️ Editar</button>
-                <button onclick="eliminarCancion()">🗑️ Eliminar</button>
-            </div>
-        </div>
-
-        <div id="formulario" class="hidden">
-            <h2 id="form-title">Agregar Nueva Canción</h2>
-            <input type="text" id="nuevo-titulo" placeholder="Título de la canción">
-            <textarea id="nueva-letra" placeholder="Letra y acordes"></textarea>
-            <button onclick="guardarCancion()">✅ Guardar</button>
-            <button onclick="cerrarFormulario()">❌ Cancelar</button>
         </div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", cargarCanciones);
-        let canciones = JSON.parse(localStorage.getItem("canciones")) || [];
-        let editIndex = null;
+
+        // Lista de canciones predefinidas
+        const canciones = [
+            { titulo: "Enamórame", letra: "G - C - D - Em\n\nJesús, enamórame de Ti..." },
+            { titulo: "Dios está aquí", letra: "G - D - C - Em\n\nDios está aquí, qué hermoso es..." }
+        ];
 
         function cargarCanciones() {
             let lista = document.getElementById("lista-canciones");
@@ -177,65 +167,16 @@
             let cancion = canciones[index];
             document.getElementById("titulo-cancion").textContent = cancion.titulo;
             document.getElementById("letra-cancion").textContent = cancion.letra;
-            editIndex = index;
             document.getElementById("cancion-detalle").classList.remove("hidden");
         }
 
         function cerrarDetalle() {
             document.getElementById("cancion-detalle").classList.add("hidden");
         }
-
-        function mostrarFormulario() {
-            document.getElementById("formulario").classList.remove("hidden");
-            document.getElementById("form-title").textContent = "Agregar Nueva Canción";
-            document.getElementById("nuevo-titulo").value = "";
-            document.getElementById("nueva-letra").value = "";
-            editIndex = null;
-        }
-
-        function cerrarFormulario() {
-            document.getElementById("formulario").classList.add("hidden");
-        }
-
-        function guardarCancion() {
-            let titulo = document.getElementById("nuevo-titulo").value.trim();
-            let letra = document.getElementById("nueva-letra").value.trim();
-
-            if (!titulo || !letra) {
-                alert("Completa todos los campos.");
-                return;
-            }
-
-            if (editIndex !== null) {
-                canciones[editIndex] = { titulo, letra };
-            } else {
-                canciones.push({ titulo, letra });
-            }
-
-            localStorage.setItem("canciones", JSON.stringify(canciones));
-            cargarCanciones();
-            cerrarFormulario();
-        }
-
-        function editarCancion() {
-            document.getElementById("formulario").classList.remove("hidden");
-            document.getElementById("form-title").textContent = "Editar Canción";
-            document.getElementById("nuevo-titulo").value = canciones[editIndex].titulo;
-            document.getElementById("nueva-letra").value = canciones[editIndex].letra;
-        }
-
-        function eliminarCancion() {
-            if (confirm("¿Seguro que quieres eliminar esta canción?")) {
-                canciones.splice(editIndex, 1);
-                localStorage.setItem("canciones", JSON.stringify(canciones));
-                cargarCanciones();
-                cerrarDetalle();
-            }
-        }
     </script>
-    <footer style="position: fixed; bottom: 0; width: 100%; background-color: #f4f4f4; padding: 10px; text-align: center;font-weight: bold;">
-        </p>Contacto:<a href="mailto:emanuelfrxs00@gmail.com"
-        style="color:#333; text-decoration: none;">emanuelfrxs00@gmail.com</a></p>
-        </footer>
+
+    <footer style="position: fixed; bottom: 0; width: 100%; background-color: #f4f4f4; padding: 10px; text-align: center; font-weight: bold;">
+        <p>Contacto: <a href="mailto:emanuelfrxs00@gmail.com" style="color:#333; text-decoration: none;">emanuelfrxs00@gmail.com</a></p>
+    </footer>
 </body>
 </html>
