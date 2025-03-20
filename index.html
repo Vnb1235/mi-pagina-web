@@ -7,14 +7,14 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
             background-color: #f4f4f4;
             margin: 0;
             padding: 20px;
+            text-align: center;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 900px;
             margin: auto;
             background: white;
             padding: 20px;
@@ -26,6 +26,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            margin-bottom: 10px;
         }
 
         .search-box input {
@@ -44,12 +45,22 @@
             font-size: 18px;
         }
 
-        ul {
+        .content {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .song-list {
+            width: 45%;
+            text-align: left;
+        }
+
+        .song-list ul {
             list-style: none;
             padding: 0;
         }
 
-        ul li {
+        .song-list li {
             background: #ddd;
             padding: 10px;
             margin: 5px;
@@ -57,24 +68,44 @@
             border-radius: 5px;
         }
 
-        ul li:hover {
+        .song-list li:hover {
             background: #bbb;
         }
 
-        pre {
-            white-space: pre-wrap;
+        .song-details {
+            width: 50%;
             text-align: left;
+        }
+
+        .song-details h2 {
+            margin-bottom: 10px;
+        }
+
+        .song-details pre {
             background: #eee;
             padding: 10px;
             border-radius: 5px;
+            white-space: pre-wrap;
         }
 
-        #acordes {
-            margin-top: 30px;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .buttons button {
+            width: 48%;
+            padding: 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .buttons button:hover {
+            background-color: #c82333;
         }
 
         #no-result {
@@ -95,21 +126,29 @@
         </div>
 
         <p id="no-result">❌ Canción no encontrada</p>
-        
-        <ul id="lista-canciones"></ul>
-    </div>
 
-    <div id="acordes" class="container">
-        <h2 id="titulo-cancion">Selecciona una canción</h2>
-        <pre id="letra-cancion">Aquí aparecerán los acordes...</pre>
+        <div class="content">
+            <!-- Lista de canciones -->
+            <div class="song-list">
+                <h2>Lista de Canciones</h2>
+                <ul id="lista-canciones"></ul>
+            </div>
+
+            <!-- Detalle de la canción -->
+            <div class="song-details">
+                <h2 id="titulo-cancion">Selecciona una canción</h2>
+                <pre id="letra-cancion">Aquí aparecerán los acordes</pre>
+                <div class="buttons">
+                    <button onclick="eliminarCancion()">🗑️ Eliminar</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", cargarCanciones);
-
-        // Lista de canciones predefinidas
-        const canciones = [
-            { titulo: "Espiritu Santo Ven", letra: "INTRO: Em D C B
+        let canciones = [
+            { titulo: "Espiritu Santo Ven - Barak", letra: "INTRO: Em D C B
 
 Em                                                   D
 Estoy aquí, desesperado por ti
@@ -182,8 +221,8 @@ C#
 F#
 de ti
 " },
-            { titulo: "Dios está aquí", letra: "sin letra xd" }
-        ];
+            { titulo: "Tu Fidelidad - Marcos Witt", letra: "G D C G\nTu fidelidad es grande..." }
+        ]; 
 
         function cargarCanciones() {
             let lista = document.getElementById("lista-canciones");
@@ -217,14 +256,18 @@ de ti
             let cancion = canciones[index];
             document.getElementById("titulo-cancion").textContent = cancion.titulo;
             document.getElementById("letra-cancion").textContent = cancion.letra;
+        }
 
-            // Desplazarse suavemente a la sección de acordes
-            document.getElementById("acordes").scrollIntoView({ behavior: "smooth" });
+        function eliminarCancion() {
+            let titulo = document.getElementById("titulo-cancion").textContent;
+            let index = canciones.findIndex(c => c.titulo === titulo);
+            if (index !== -1) {
+                canciones.splice(index, 1);
+                cargarCanciones();
+                document.getElementById("titulo-cancion").textContent = "Selecciona una canción";
+                document.getElementById("letra-cancion").textContent = "Aquí aparecerán los acordes";
+            }
         }
     </script>
-
-    <footer style="position: fixed; bottom: 0; width: 100%; background-color: #f4f4f4; padding: 10px; text-align: center; font-weight: bold;">
-        <p>Contacto: <a href="mailto:emanuelfrxs00@gmail.com" style="color:#333; text-decoration: none;">emanuelfrxs00@gmail.com</a></p>
-    </footer>
 </body>
 </html>
