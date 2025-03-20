@@ -44,22 +44,6 @@
             font-size: 18px;
         }
 
-        button {
-            width: 90%;
-            margin: 10px 0;
-            padding: 10px;
-            font-size: 16px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        button:hover {
-            background-color: #218838;
-        }
-
         ul {
             list-style: none;
             padding: 0;
@@ -77,10 +61,6 @@
             background: #bbb;
         }
 
-        .hidden {
-            display: none;
-        }
-
         pre {
             white-space: pre-wrap;
             text-align: left;
@@ -89,13 +69,12 @@
             border-radius: 5px;
         }
 
-        .buttons {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .buttons button {
-            width: 45%;
+        #acordes {
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
 
         #no-result {
@@ -118,12 +97,11 @@
         <p id="no-result">❌ Canción no encontrada</p>
         
         <ul id="lista-canciones"></ul>
+    </div>
 
-        <div id="cancion-detalle" class="hidden">
-            <button onclick="cerrarDetalle()">🔙 Volver</button>
-            <h2 id="titulo-cancion"></h2>
-            <pre id="letra-cancion"></pre>
-        </div>
+    <div id="acordes" class="container">
+        <h2 id="titulo-cancion">Selecciona una canción</h2>
+        <pre id="letra-cancion">Aquí aparecerán los acordes...</pre>
     </div>
 
     <script>
@@ -131,8 +109,80 @@
 
         // Lista de canciones predefinidas
         const canciones = [
-            { titulo: "Enamórame", letra: "G - C - D - Em\n\nJesús, enamórame de Ti..." },
-            { titulo: "Dios está aquí", letra: "G - D - C - Em\n\nDios está aquí, qué hermoso es..." }
+            { titulo: "Espiritu Santo Ven", letra: "INTRO: Em D C B
+
+Em                                                   D
+Estoy aquí, desesperado por ti
+             C                                                               B
+Con un corazón sediento, que espera beber
+
+de ti
+
+C
+Cuando tu gloria desciende a un lugar
+D
+Toda la tierra tiene que adorar
+C/A
+Resucitan los muertos se sanan enfermos
+    Bsus4-B
+por tu poder.
+C
+Queremos de ti llénanos de ti
+D
+Espíritu santo envuélvenos en ti
+C/A                                          Bsus4     B
+Derrama tu gloria, Esperamos por ti
+
+CORO:
+Em
+//Ven, ven, ven espíritu santo
+D
+Ven, ven, ven espíritu santo
+C                                                Bsus4-B
+Ven, ven, ven llena este lugar//
+
+
+
+C
+Cuando tu gloria desciende a un lugar
+D
+Toda la tierra tiene que adorar
+C/A
+Resucitan los muertos se sanan enfermos
+    Bsus4-B
+por tu poder.
+C
+Queremos de ti llénanos de ti
+D
+Espíritu santo…
+C/A                                          Bsus4     B
+Derrama tu gloria, Esperamos por ti
+
+CORO:
+ Em
+//Ven, ven, ven espíritu santo
+D
+Ven, ven, ven espíritu santo
+C                                                Bsus4-B
+Ven, ven, ven llena este lugar//
+ (en la segunda solo batería)
+SUBE TONO
+ Fm
+////Ven, ven, ven espíritu santo
+E
+Ven, ven, ven espíritu santo
+D                                                C#
+Ven, ven, ven llena este lugar////
+Fm                                                   E
+Estoy aquí, desesperado por ti
+                   D                                                       
+Con un corazón sediento, que espera
+C#
+ beber
+F#
+de ti
+" },
+            { titulo: "Dios está aquí", letra: "sin letra xd" }
         ];
 
         function cargarCanciones() {
@@ -167,11 +217,9 @@
             let cancion = canciones[index];
             document.getElementById("titulo-cancion").textContent = cancion.titulo;
             document.getElementById("letra-cancion").textContent = cancion.letra;
-            document.getElementById("cancion-detalle").classList.remove("hidden");
-        }
 
-        function cerrarDetalle() {
-            document.getElementById("cancion-detalle").classList.add("hidden");
+            // Desplazarse suavemente a la sección de acordes
+            document.getElementById("acordes").scrollIntoView({ behavior: "smooth" });
         }
     </script>
 
