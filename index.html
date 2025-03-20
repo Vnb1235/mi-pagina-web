@@ -3,271 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎸 Letras y Acordes</title>
+    <title>Lista de Canciones</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
             text-align: center;
         }
 
-        .container {
-            max-width: 900px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        .hidden {
+            display: none;
         }
 
-        .search-box {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .search-box input {
-            width: 80%;
-            padding: 10px;
-            font-size: 16px;
-        }
-
-        .search-box button {
-            width: 40px;
-            height: 40px;
-            background: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        .content {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .song-list {
-            width: 45%;
-            text-align: left;
-        }
-
-        .song-list ul {
+        #lista-canciones {
             list-style: none;
             padding: 0;
         }
 
-        .song-list li {
-            background: #ddd;
+        #lista-canciones li {
+            cursor: pointer;
             padding: 10px;
+            border: 1px solid #ddd;
+            margin: 5px;
+            background-color: #f9f9f9;
+        }
+
+        #formulario, #cancion-detalle {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px auto;
+            max-width: 400px;
+            background-color: #fff;
+        }
+
+        button {
+            padding: 8px 15px;
             margin: 5px;
             cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .song-list li:hover {
-            background: #bbb;
-        }
-
-        .song-details {
-            width: 50%;
-            text-align: left;
-        }
-
-        .song-details h2 {
-            margin-bottom: 10px;
-        }
-
-        .song-details pre {
-            background: #eee;
-            padding: 10px;
-            border-radius: 5px;
-            white-space: pre-wrap;
-        }
-
-        .buttons {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .buttons button {
-            width: 48%;
-            padding: 10px;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .buttons button:hover {
-            background-color: #c82333;
-        }
-
-        #no-result {
-            display: none;
-            color: red;
-            font-weight: bold;
-            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎸 Letras y Acordes</h1>
 
-        <div class="search-box">
-            <input type="text" id="search" placeholder="Buscar canción...">
-            <button onclick="filtrarCanciones()">🔍</button>
-        </div>
+    <h1>Lista de Canciones</h1>
+    
+    <button onclick="mostrarFormulario()">➕ Agregar Canción</button>
 
-        <p id="no-result">❌ Canción no encontrada</p>
+    <ul id="lista-canciones"></ul>
 
-        <div class="content">
-            <!-- Lista de canciones -->
-            <div class="song-list">
-                <h2>Lista de Canciones</h2>
-                <ul id="lista-canciones"></ul>
-            </div>
+    <div id="cancion-detalle" class="hidden">
+        <h2 id="titulo-cancion"></h2>
+        <pre id="letra-cancion"></pre>
+        <button onclick="cerrarDetalle()">⬅ Volver</button>
+    </div>
 
-            <!-- Detalle de la canción -->
-            <div class="song-details">
-                <h2 id="titulo-cancion">Selecciona una canción</h2>
-                <pre id="letra-cancion">Aquí aparecerán los acordes</pre>
-                <div class="buttons">
-                    <button onclick="eliminarCancion()">🗑️ Eliminar</button>
-                </div>
-            </div>
-        </div>
+    <div id="formulario" class="hidden">
+        <h2>Agregar Nueva Canción</h2>
+        <input type="text" id="nuevo-titulo" placeholder="Título de la canción">
+        <textarea id="nueva-letra" placeholder="Letra de la canción"></textarea>
+        <button onclick="guardarCancion()">Guardar</button>
+        <button onclick="cerrarFormulario()">Cancelar</button>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", cargarCanciones);
-        let canciones = [
-            { titulo: "Espiritu Santo Ven - Barak", letra: "INTRO: Em D C B
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyB7jgae3kpsz_Mt6OyM31MY3o4nBwvSSqo",
+            authDomain: "base-de-datos-17708.firebaseapp.com",
+            projectId: "base-de-datos-17708",
+            storageBucket: "base-de-datos-17708.firebasestorage.app",
+            messagingSenderId: "1071518981083",
+            appId: "1:1071518981083:web:bace94773b1e2974bc25fe",
+            measurementId: "G-YQJBBSZCEF"
+        };
 
-Em                                                   D
-Estoy aquí, desesperado por ti
-             C                                                               B
-Con un corazón sediento, que espera beber
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-de ti
+        // Función para mostrar el formulario de agregar canción
+        function mostrarFormulario() {
+            document.getElementById("formulario").classList.remove("hidden");
+        }
 
-C
-Cuando tu gloria desciende a un lugar
-D
-Toda la tierra tiene que adorar
-C/A
-Resucitan los muertos se sanan enfermos
-    Bsus4-B
-por tu poder.
-C
-Queremos de ti llénanos de ti
-D
-Espíritu santo envuélvenos en ti
-C/A                                          Bsus4     B
-Derrama tu gloria, Esperamos por ti
+        // Función para cerrar el formulario
+        function cerrarFormulario() {
+            document.getElementById("formulario").classList.add("hidden");
+        }
 
-CORO:
-Em
-//Ven, ven, ven espíritu santo
-D
-Ven, ven, ven espíritu santo
-C                                                Bsus4-B
-Ven, ven, ven llena este lugar//
+        // Guardar nueva canción en Firebase
+        function guardarCancion() {
+            let titulo = document.getElementById("nuevo-titulo").value.trim();
+            let letra = document.getElementById("nueva-letra").value.trim();
 
+            if (!titulo || !letra) {
+                alert("Completa todos los campos.");
+                return;
+            }
 
+            database.ref('canciones/').push({
+                titulo: titulo,
+                letra: letra
+            });
 
-C
-Cuando tu gloria desciende a un lugar
-D
-Toda la tierra tiene que adorar
-C/A
-Resucitan los muertos se sanan enfermos
-    Bsus4-B
-por tu poder.
-C
-Queremos de ti llénanos de ti
-D
-Espíritu santo…
-C/A                                          Bsus4     B
-Derrama tu gloria, Esperamos por ti
+            alert("Canción guardada correctamente.");
+            cerrarFormulario();
+        }
 
-CORO:
- Em
-//Ven, ven, ven espíritu santo
-D
-Ven, ven, ven espíritu santo
-C                                                Bsus4-B
-Ven, ven, ven llena este lugar//
- (en la segunda solo batería)
-SUBE TONO
- Fm
-////Ven, ven, ven espíritu santo
-E
-Ven, ven, ven espíritu santo
-D                                                C#
-Ven, ven, ven llena este lugar////
-Fm                                                   E
-Estoy aquí, desesperado por ti
-                   D                                                       
-Con un corazón sediento, que espera
-C#
- beber
-F#
-de ti
-" },
-            { titulo: "Tu Fidelidad - Marcos Witt", letra: "G D C G\nTu fidelidad es grande..." }
-        ]; 
-
+        // Cargar canciones desde Firebase
         function cargarCanciones() {
             let lista = document.getElementById("lista-canciones");
             lista.innerHTML = "";
-            canciones.forEach((cancion, index) => {
-                let li = document.createElement("li");
-                li.textContent = cancion.titulo;
-                li.onclick = () => mostrarDetalle(index);
-                lista.appendChild(li);
+
+            database.ref('canciones/').on("value", function(snapshot) {
+                lista.innerHTML = "";
+                snapshot.forEach(function(childSnapshot) {
+                    let cancion = childSnapshot.val();
+                    let li = document.createElement("li");
+                    li.textContent = cancion.titulo;
+                    li.onclick = () => mostrarDetalle(cancion.titulo, cancion.letra);
+                    lista.appendChild(li);
+                });
             });
         }
 
-        function filtrarCanciones() {
-            let filtro = document.getElementById("search").value.toLowerCase();
-            let items = document.querySelectorAll("#lista-canciones li");
-            let encontrado = false;
-
-            items.forEach(item => {
-                if (item.textContent.toLowerCase().includes(filtro)) {
-                    item.style.display = "block";
-                    encontrado = true;
-                } else {
-                    item.style.display = "none";
-                }
-            });
-
-            document.getElementById("no-result").style.display = encontrado ? "none" : "block";
+        // Mostrar detalles de la canción seleccionada
+        function mostrarDetalle(titulo, letra) {
+            document.getElementById("titulo-cancion").textContent = titulo;
+            document.getElementById("letra-cancion").textContent = letra;
+            document.getElementById("cancion-detalle").classList.remove("hidden");
         }
 
-        function mostrarDetalle(index) {
-            let cancion = canciones[index];
-            document.getElementById("titulo-cancion").textContent = cancion.titulo;
-            document.getElementById("letra-cancion").textContent = cancion.letra;
+        // Cerrar detalle de la canción
+        function cerrarDetalle() {
+            document.getElementById("cancion-detalle").classList.add("hidden");
         }
 
-        function eliminarCancion() {
-            let titulo = document.getElementById("titulo-cancion").textContent;
-            let index = canciones.findIndex(c => c.titulo === titulo);
-            if (index !== -1) {
-                canciones.splice(index, 1);
-                cargarCanciones();
-                document.getElementById("titulo-cancion").textContent = "Selecciona una canción";
-                document.getElementById("letra-cancion").textContent = "Aquí aparecerán los acordes";
-            }
-        }
+        // Cargar canciones al cargar la página
+        document.addEventListener("DOMContentLoaded", cargarCanciones);
     </script>
+
 </body>
 </html>
