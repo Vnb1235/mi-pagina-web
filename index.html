@@ -3,146 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Canciones</title>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
+    <title>🎸 Letras y Acordes</title>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
         }
-
-        .hidden {
-            display: none;
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
-
-        #lista-canciones {
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        ul {
             list-style: none;
             padding: 0;
         }
-
-        #lista-canciones li {
-            cursor: pointer;
+        ul li {
+            background: #ddd;
             padding: 10px;
-            border: 1px solid #ddd;
-            margin: 5px;
-            background-color: #f9f9f9;
-        }
-
-        #formulario, #cancion-detalle {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 10px auto;
-            max-width: 400px;
-            background-color: #fff;
-        }
-
-        button {
-            padding: 8px 15px;
             margin: 5px;
             cursor: pointer;
+            border-radius: 5px;
+        }
+        ul li:hover {
+            background: #bbb;
+        }
+        #detalle {
+            display: none;
+            margin-top: 20px;
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>🎸 Letras y Acordes</h1>
+        <input type="text" id="titulo" placeholder="Título de la canción">
+        <textarea id="letra" placeholder="Letra y acordes"></textarea>
+        <button onclick="guardarCancion()">✅ Guardar Canción</button>
 
-    <h1>Lista de Canciones</h1>
-    
-    <button onclick="mostrarFormulario()">➕ Agregar Canción</button>
+        <h2>Lista de Canciones</h2>
+        <ul id="lista-canciones"></ul>
 
-    <ul id="lista-canciones"></ul>
-
-    <div id="cancion-detalle" class="hidden">
-        <h2 id="titulo-cancion"></h2>
-        <pre id="letra-cancion"></pre>
-        <button onclick="cerrarDetalle()">⬅ Volver</button>
-    </div>
-
-    <div id="formulario" class="hidden">
-        <h2>Agregar Nueva Canción</h2>
-        <input type="text" id="nuevo-titulo" placeholder="Título de la canción">
-        <textarea id="nueva-letra" placeholder="Letra de la canción"></textarea>
-        <button onclick="guardarCancion()">Guardar</button>
-        <button onclick="cerrarFormulario()">Cancelar</button>
+        <div id="detalle">
+            <h2 id="detalle-titulo"></h2>
+            <pre id="detalle-letra"></pre>
+            <button onclick="cerrarDetalle()">🔙 Cerrar</button>
+        </div>
     </div>
 
     <script>
-        // Configuración de Firebase
+        // 🔥 Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyB7jgae3kpsz_Mt6OyM31MY3o4nBwvSSqo",
             authDomain: "base-de-datos-17708.firebaseapp.com",
+            databaseURL: "https://base-de-datos-17708-default-rtdb.firebaseio.com",
             projectId: "base-de-datos-17708",
-            storageBucket: "base-de-datos-17708.firebasestorage.app",
+            storageBucket: "base-de-datos-17708.appspot.com",
             messagingSenderId: "1071518981083",
             appId: "1:1071518981083:web:bace94773b1e2974bc25fe",
             measurementId: "G-YQJBBSZCEF"
         };
-
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Función para mostrar el formulario de agregar canción
-        function mostrarFormulario() {
-            document.getElementById("formulario").classList.remove("hidden");
-        }
-
-        // Función para cerrar el formulario
-        function cerrarFormulario() {
-            document.getElementById("formulario").classList.add("hidden");
-        }
-
-        // Guardar nueva canción en Firebase
         function guardarCancion() {
-            let titulo = document.getElementById("nuevo-titulo").value.trim();
-            let letra = document.getElementById("nueva-letra").value.trim();
+            let titulo = document.getElementById("titulo").value.trim();
+            let letra = document.getElementById("letra").value.trim();
 
             if (!titulo || !letra) {
                 alert("Completa todos los campos.");
                 return;
             }
 
-            database.ref('canciones/').push({
+            let nuevaCancionRef = database.ref("canciones").push();
+            nuevaCancionRef.set({
                 titulo: titulo,
                 letra: letra
+            }).then(() => {
+                alert("Canción guardada correctamente");
+                document.getElementById("titulo").value = "";
+                document.getElementById("letra").value = "";
+            }).catch(error => {
+                console.error("Error al guardar:", error);
+                alert("Hubo un error al guardar la canción");
             });
-
-            alert("Canción guardada correctamente.");
-            cerrarFormulario();
         }
 
-        // Cargar canciones desde Firebase
         function cargarCanciones() {
             let lista = document.getElementById("lista-canciones");
             lista.innerHTML = "";
 
-            database.ref('canciones/').on("value", function(snapshot) {
-                lista.innerHTML = "";
-                snapshot.forEach(function(childSnapshot) {
+            database.ref("canciones").on("value", snapshot => {
+                lista.innerHTML = ""; 
+                snapshot.forEach(childSnapshot => {
                     let cancion = childSnapshot.val();
                     let li = document.createElement("li");
                     li.textContent = cancion.titulo;
-                    li.onclick = () => mostrarDetalle(cancion.titulo, cancion.letra);
+                    li.onclick = () => mostrarDetalle(cancion);
                     lista.appendChild(li);
                 });
             });
         }
 
-        // Mostrar detalles de la canción seleccionada
-        function mostrarDetalle(titulo, letra) {
-            document.getElementById("titulo-cancion").textContent = titulo;
-            document.getElementById("letra-cancion").textContent = letra;
-            document.getElementById("cancion-detalle").classList.remove("hidden");
+        function mostrarDetalle(cancion) {
+            document.getElementById("detalle-titulo").textContent = cancion.titulo;
+            document.getElementById("detalle-letra").textContent = cancion.letra;
+            document.getElementById("detalle").style.display = "block";
         }
 
-        // Cerrar detalle de la canción
         function cerrarDetalle() {
-            document.getElementById("cancion-detalle").classList.add("hidden");
+            document.getElementById("detalle").style.display = "none";
         }
 
-        // Cargar canciones al cargar la página
-        document.addEventListener("DOMContentLoaded", cargarCanciones);
+        cargarCanciones();
     </script>
-
 </body>
 </html>
